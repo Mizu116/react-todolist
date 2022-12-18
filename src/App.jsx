@@ -7,6 +7,7 @@ export default function App() {
     const [activeEdit,setActiveEdit] = useState(false);
     const [editTodo,setEditTodo] = useState('');
     const [activeIndex,setActiveIndex] = useState(0);
+    const [newId, setNewId] = useState(0);
 
     function handleInputChange(e) {
       setTodo(e.target.value);
@@ -15,7 +16,8 @@ export default function App() {
     function handleFormSubmit(e) {
       e.preventDefault();
       if(todo !== '') {
-        setTodos([...todos,{text: todo, status: "incomplete"}])
+        setTodos([...todos,{text: todo, status: "incomplete", id:newId}])
+        setNewId(newId +1)
         setTodo('')
       }
     }
@@ -23,9 +25,12 @@ export default function App() {
     function handleEditSubmit(e){
       e.preventDefault();
       if(editTodo !== '') {
-        let newTodos = [...todos];
-        newTodos[activeIndex] = {text: editTodo, status: newTodos[activeIndex].status};
-        setTodos(newTodos)
+        setTodos(todos.map((todo, index)=>{
+          if(index === activeIndex){
+            return {text: editTodo, status: todo.status}
+          }
+          return todo
+        }))
         setActiveEdit(false)
       }
     }
@@ -77,7 +82,7 @@ export default function App() {
 
     <ul className='todo-list'>
         {todos.map((todo,index) => (
-            <li><span className='todo-text'>{todo.text}</span>
+            <li key={todo.id}><span className='todo-text'>{todo.text}</span>
             <select name="status" value={todo.status} onChange={(event) => changeStatus(event,index)}>
               <option value="incomplete">未着手</option>
               <option value="now">着手</option>
